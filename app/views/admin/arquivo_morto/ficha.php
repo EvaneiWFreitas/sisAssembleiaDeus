@@ -1,5 +1,5 @@
 <header class="print-top">
-  <img src="<?= e(asset('img/logo-assembleia.svg')) ?>" alt="">
+  <img src="<?= e($logotipo ?? \App\SiteRepository::logotipo()) ?>" alt="">
   <div>
     <strong>Assembleia de Deus</strong>
     <small>sisAssembleiaDeus · Arquivo Morto</small>

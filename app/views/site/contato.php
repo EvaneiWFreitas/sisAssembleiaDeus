@@ -55,7 +55,7 @@
         </div>
       </div>
 
-      <div class="col-lg-5">
+      <div class="col-lg-5 contact-info">
         <div class="card-site mb-3">
           <span class="icon-box"><i class="fa-solid fa-location-dot"></i></span>
           <h2 class="h6">Endereço</h2>

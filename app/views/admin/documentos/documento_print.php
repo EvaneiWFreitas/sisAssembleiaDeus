@@ -20,7 +20,7 @@ $campos = [
 $campos = array_filter($campos, static fn (string $valor): bool => $valor !== '');
 ?>
 <header class="print-top">
-  <img src="<?= e(asset('img/logo-assembleia.svg')) ?>" alt="">
+  <img src="<?= e($logotipo ?? \App\SiteRepository::logotipo()) ?>" alt="">
   <div>
     <strong><?= e($ministerio !== '' ? $ministerio : 'Assembleia de Deus') ?></strong>
     <small>sisAssembleiaDeus · Documentos emitidos</small>

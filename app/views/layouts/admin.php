@@ -13,7 +13,7 @@ foreach ($modulos as $chave => $modulo) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= e($titulo ?? 'Painel') ?> | sisAssembleiaDeus</title>
-  <link rel="icon" href="<?= e(asset('img/logo-assembleia.svg')) ?>" type="image/svg+xml">
+  <link rel="icon" href="<?= e($logotipo ?? \App\SiteRepository::logotipo()) ?>">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
   <link href="<?= e(asset('css/admin.css')) ?>" rel="stylesheet">
@@ -21,7 +21,7 @@ foreach ($modulos as $chave => $modulo) {
 <body class="admin-body">
   <aside class="admin-sidebar" id="adminSidebar">
     <a class="admin-brand" href="<?= e(url('/admin')) ?>">
-      <img src="<?= e(asset('img/logo-assembleia.svg')) ?>" alt="">
+      <img src="<?= e($logotipo ?? \App\SiteRepository::logotipo()) ?>" alt="">
       <span>
         <strong>sisAssembleiaDeus</strong>
         <small>Painel administrativo</small>

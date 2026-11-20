@@ -21,6 +21,8 @@ final class SiteRepository
             'config' => self::configuracoes(),
             'rotaAtiva' => $rotaAtiva,
             'nomeIgreja' => $nome,
+            'logotipo' => self::logotipo(),
+            'assinaturaPastor' => self::assinaturaPastor(),
             'pastorPresidente' => self::config('pastor_presidente', ''),
             'endereco' => self::endereco(),
             'telefone' => self::config('ministerio_telefone', ''),
@@ -97,6 +99,17 @@ final class SiteRepository
             : '55' . ltrim($digitos, '0');
 
         return 'https://wa.me/' . $numero;
+    }
+
+    public static function logotipo(): string
+    {
+        return self::imagem(self::config('ministerio_logotipo', ''), 'assets/img/logo-assembleia.svg');
+    }
+
+    public static function assinaturaPastor(): string
+    {
+        $caminho = self::config('assinatura_pastor', '');
+        return $caminho === '' ? '' : self::imagem($caminho, '');
     }
 
     public static function imagem(?string $caminho, string $padrao = 'assets/img/galeria-placeholder.svg'): string

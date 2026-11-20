@@ -24,7 +24,7 @@ $modelo = preg_replace('/[^a-z]/', '', (string) ($convite['modelo'] ?? 'classico
   .convite-assinaturas small { color: #64748b; }
 </style>
 <header class="print-top">
-  <img src="<?= e(asset('img/logo-assembleia.svg')) ?>" alt="">
+  <img src="<?= e($logotipo ?? \App\SiteRepository::logotipo()) ?>" alt="">
   <div>
     <strong><?= e($ministerio !== '' ? $ministerio : 'Assembleia de Deus') ?></strong>
     <small>sisAssembleiaDeus · Correspondência eclesiástica</small>
@@ -64,7 +64,10 @@ $modelo = preg_replace('/[^a-z]/', '', (string) ($convite['modelo'] ?? 'classico
   <div class="convite-numero">Registro nº <?= e((string) ($convite['numero'] ?? '')) ?> · Emitido em <?= e(format_date((string) ($convite['emitido_em'] ?? ''), 'd/m/Y')) ?></div>
 
   <div class="convite-assinaturas">
-    <?php if ($assinaturas === []): ?>
+    <?php $assinaturaImagem = $assinaturaPastor ?? \App\SiteRepository::assinaturaPastor(); ?>
+    <?php if ($assinaturaImagem !== ''): ?>
+      <div><img src="<?= e($assinaturaImagem) ?>" alt="Assinatura do pastor" style="height:48px;max-width:100%;object-fit:contain;"><small>Pastor responsável</small></div>
+    <?php elseif ($assinaturas === []): ?>
       <div><span></span><small>Pastor responsável</small></div>
     <?php else: ?>
       <?php foreach ($assinaturas as $ass): ?>

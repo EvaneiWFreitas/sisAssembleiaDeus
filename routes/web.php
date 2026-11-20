@@ -138,6 +138,7 @@ return static function (Router $router): void {
         return Response::html(View::render('auth/login', [
             'titulo' => 'Acesso ao painel',
             'nomeIgreja' => SiteRepository::contexto()['nomeIgreja'],
+            'logotipo' => SiteRepository::logotipo(),
             'erro' => is_string($erro) ? $erro : '',
             'aviso' => is_string($aviso) ? $aviso : '',
             'email' => is_string($email) ? $email : '',

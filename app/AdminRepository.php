@@ -15,6 +15,8 @@ final class AdminRepository
 
         return [
             'usuario' => $usuario,
+            'logotipo' => SiteRepository::logotipo(),
+            'assinaturaPastor' => SiteRepository::assinaturaPastor(),
             'perfilNome' => self::perfilNome($perfilId),
             'permissoes' => Permission::all(),
             'modulos' => self::modulos(),

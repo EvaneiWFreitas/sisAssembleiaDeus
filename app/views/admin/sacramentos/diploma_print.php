@@ -8,7 +8,7 @@ $pastor = (string) ($diploma[$tipo === 'batismo' ? 'pastor_celebrante' : 'pastor
 $cargo = (string) ($diploma['cargo_ministerial'] ?? '');
 ?>
 <header class="print-top">
-  <img src="<?= e(asset('img/logo-assembleia.svg')) ?>" alt="">
+  <img src="<?= e($logotipo ?? \App\SiteRepository::logotipo()) ?>" alt="">
   <div>
     <strong>Assembleia de Deus</strong>
     <small>sisAssembleiaDeus · Diplomas e certificados</small>
@@ -44,7 +44,10 @@ $cargo = (string) ($diploma['cargo_ministerial'] ?? '');
   <div class="diploma-numero">Registro nº <?= e($numero !== '' ? $numero : '—') ?></div>
 
   <div class="diploma-assinaturas">
-    <?php if ($assinaturas === []): ?>
+    <?php $assinaturaImagem = $assinaturaPastor ?? \App\SiteRepository::assinaturaPastor(); ?>
+    <?php if ($assinaturaImagem !== ''): ?>
+      <div><img src="<?= e($assinaturaImagem) ?>" alt="Assinatura do pastor" style="height:48px;max-width:100%;object-fit:contain;"><small>Celebrante / Presidente</small></div>
+    <?php elseif ($assinaturas === []): ?>
       <div><span></span><small>Celebrante / Presidente</small></div>
     <?php else: ?>
       <?php foreach ($assinaturas as $ass): ?>
