@@ -236,7 +236,7 @@ Para publicar:
 
 ## 👨‍💻 Desenvolvedor
 
-**Evanei William Nascimento de Freitas**
+**Dev Evanei Freitas**
 
 Desenvolvedor de Sistemas | Bacharel em Engenharia de Software
 
