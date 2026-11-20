@@ -1,0 +1,39 @@
+-- Configurações gerais com valores neutros, a serem preenchidos pelo administrador
+SET NAMES utf8mb4;
+USE `ezyro_43462517_gestao_igreja`;
+
+INSERT INTO `configuracoes` (`chave`, `valor`, `grupo`, `tipo`, `descricao`) VALUES
+    ('ministerio_nome', 'Nome do Ministério', 'identidade', 'texto', 'Nome institucional exibido no site e nos documentos.'),
+    ('ministerio_logotipo', '', 'identidade', 'arquivo', 'Caminho do logotipo institucional.'),
+    ('ministerio_cnpj', '', 'identidade', 'texto', 'CNPJ do ministério, quando aplicável.'),
+    ('ministerio_endereco', '', 'contato', 'texto', 'Endereço da Igreja Matriz.'),
+    ('ministerio_numero', '', 'contato', 'texto', 'Número do endereço.'),
+    ('ministerio_complemento', '', 'contato', 'texto', 'Complemento do endereço.'),
+    ('ministerio_bairro', '', 'contato', 'texto', 'Bairro da Igreja Matriz.'),
+    ('ministerio_cidade', '', 'contato', 'texto', 'Cidade da Igreja Matriz.'),
+    ('ministerio_estado', '', 'contato', 'texto', 'Estado da Igreja Matriz (sigla).'),
+    ('ministerio_cep', '', 'contato', 'texto', 'CEP da Igreja Matriz.'),
+    ('ministerio_telefone', '', 'contato', 'texto', 'Telefone institucional.'),
+    ('ministerio_whatsapp', '', 'contato', 'texto', 'WhatsApp institucional.'),
+    ('ministerio_email', '', 'contato', 'email', 'E-mail institucional.'),
+    ('redes_facebook', '', 'redes', 'url', 'Link da página no Facebook.'),
+    ('redes_instagram', '', 'redes', 'url', 'Link do perfil no Instagram.'),
+    ('redes_youtube', '', 'redes', 'url', 'Link do canal no YouTube.'),
+    ('redes_telegram', '', 'redes', 'url', 'Link do canal no Telegram.'),
+    ('pastor_presidente', '', 'pastoral', 'texto', 'Nome do pastor presidente.'),
+    ('assinatura_pastor', '', 'pastoral', 'arquivo', 'Caminho da imagem da assinatura do pastor.'),
+    ('cor_primaria', '#0b2545', 'identidade', 'cor', 'Cor primária da identidade visual.'),
+    ('cor_secundaria', '#c9a227', 'identidade', 'cor', 'Cor secundária da identidade visual.'),
+    ('cor_fundo', '#f4f6f9', 'identidade', 'cor', 'Cor de fundo das páginas.'),
+    ('versiculo_referencia', '', 'publico', 'texto', 'Referência do versículo em destaque.'),
+    ('versiculo_texto', '', 'publico', 'texto', 'Texto do versículo em destaque.'),
+    ('palavra_pastoral_titulo', '', 'publico', 'texto', 'Título da palavra pastoral.'),
+    ('palavra_pastoral_texto', '', 'publico', 'texto', 'Texto da palavra pastoral.'),
+    ('mensagem_rodape', '', 'publico', 'texto', 'Mensagem exibida no rodapé institucional.'),
+    ('url_sistema', 'http://localhost/sisAssembleiaDeus', 'geral', 'url', 'URL pública de acesso ao sistema.'),
+    ('prazo_retencao_auditoria_anos', '5', 'seguranca', 'numero', 'Prazo de retenção dos registros de auditoria, em anos.'),
+    ('tamanho_max_upload_mb', '5', 'seguranca', 'numero', 'Tamanho máximo permitido por arquivo enviado, em MB.')
+ON DUPLICATE KEY UPDATE
+    `descricao` = VALUES(`descricao`),
+    `grupo` = VALUES(`grupo`),
+    `tipo` = VALUES(`tipo`);

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Ilustração de uma igreja">
+  <defs>
+    <linearGradient id="ceu" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b2545"/>
+      <stop offset="0.55" stop-color="#1d4e89"/>
+      <stop offset="1" stop-color="#d6a93a"/>
+    </linearGradient>
+    <linearGradient id="vidro" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffe9a8"/>
+      <stop offset="1" stop-color="#c9a227"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#ceu)"/>
+  <circle cx="1280" cy="190" r="90" fill="#ffe9a8" opacity="0.65"/>
+  <path d="M0 700 Q260 620 520 690 T1040 670 T1600 700 V900 H0Z" fill="#081b33" opacity="0.65"/>
+  <g fill="#0a1f3a" opacity="0.95">
+    <rect x="520" y="360" width="560" height="330" rx="8"/>
+    <path d="M500 370 L800 170 L1100 370Z"/>
+    <rect x="770" y="120" width="60" height="130"/>
+    <path d="M800 35 L846 125 H754Z"/>
+    <rect x="430" y="690" width="740" height="28" rx="8"/>
+  </g>
+  <g fill="url(#vidro)" opacity="0.9">
+    <rect x="600" y="430" width="70" height="150" rx="35"/>
+    <rect x="930" y="430" width="70" height="150" rx="35"/>
+    <path d="M760 690V560a40 40 0 0 1 80 0v130Z"/>
+  </g>
+  <path d="M790 270h20v62h62v20h-62v62h-20v-62h-62v-20h62z" fill="#f8e6ad"/>
+  <g stroke="#ffffff" stroke-width="4" opacity="0.22">
+    <path d="M120 760h1360M80 810h1440M180 860h1240"/>
+  </g>
+</svg>

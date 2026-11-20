@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Logotipo Assembleia de Deus">
+  <circle cx="64" cy="64" r="60" fill="#ffffff" opacity="0.12"/>
+  <circle cx="64" cy="64" r="47" fill="none" stroke="#ffffff" stroke-width="3" opacity="0.65"/>
+  <path d="M58 26h12v25h25v12H70v25H58V63H33V51h25V26z" fill="#ffffff"/>
+  <path d="M64 10v8M64 110v8M10 64h8M110 64h8M25 25l6 6M97 97l6 6M103 25l-6 6M31 97l-6 6" stroke="#c9a227" stroke-width="4" stroke-linecap="round"/>
+</svg>

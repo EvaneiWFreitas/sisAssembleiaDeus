@@ -1,0 +1,80 @@
+<?php
+$ministerio = \App\DocumentoRepository::configuracao('ministerio_nome', 'Assembleia de Deus');
+$enderecoMinisterio = \App\DocumentoRepository::configuracao('ministerio_endereco', '');
+$cidade = \App\DocumentoRepository::configuracao('ministerio_cidade', '');
+$estado = \App\DocumentoRepository::configuracao('ministerio_estado', '');
+$assinaturas = array_values(array_filter(array_map('trim', explode(',', (string) ($convite['assinaturas'] ?? ''))), static fn (string $item): bool => $item !== ''));
+$modelo = preg_replace('/[^a-z]/', '', (string) ($convite['modelo'] ?? 'classico')) ?: 'classico';
+?>
+<style>
+  .convite-paper { border: 3px double #c9a227; min-height: 560px; padding: 38px; position: relative; }
+  .convite-paper.convite-moderno { border: 0; border-left: 10px solid #0b2545; }
+  .convite-paper.convite-institucional { border: 1px solid #0b2545; border-top: 8px solid #0b2545; }
+  .convite-eyebrow { color: #64748b; font-size: .76rem; letter-spacing: .14em; text-transform: uppercase; }
+  .convite-paper h1 { color: #0b2545; font-size: 1.7rem; margin: 8px 0 26px; }
+  .convite-texto { font-size: 1rem; line-height: 1.7; margin: 0 0 14px; }
+  .convite-destaque { font-size: 1.15rem; font-weight: 700; }
+  .convite-dados { border-left: 3px solid #c9a227; margin: 24px 0; padding-left: 16px; }
+  .convite-dados div { margin-bottom: 7px; }
+  .convite-dados span { color: #64748b; display: inline-block; font-size: .72rem; min-width: 92px; text-transform: uppercase; }
+  .convite-numero { color: #64748b; font-size: .78rem; margin-top: 30px; }
+  .convite-assinaturas { display: flex; flex-wrap: wrap; gap: 42px; margin-top: 36px; }
+  .convite-assinaturas div { min-width: 220px; text-align: center; }
+  .convite-assinaturas span { border-top: 1px solid #0f172a; display: block; height: 30px; }
+  .convite-assinaturas small { color: #64748b; }
+</style>
+<header class="print-top">
+  <img src="<?= e(asset('img/logo-assembleia.svg')) ?>" alt="">
+  <div>
+    <strong><?= e($ministerio !== '' ? $ministerio : 'Assembleia de Deus') ?></strong>
+    <small>sisAssembleiaDeus · Correspondência eclesiástica</small>
+  </div>
+</header>
+
+<section class="convite-paper convite-<?= e($modelo) ?>">
+  <p class="convite-eyebrow">Convite pastoral</p>
+  <h1>Carta-convite</h1>
+
+  <p class="convite-texto">À</p>
+  <p class="convite-texto convite-destaque"><?= e((string) ($convite['convidado'] ?? '')) ?></p>
+  <?php if ((string) ($convite['igreja_convidada'] ?? '') !== ''): ?>
+    <p class="convite-texto"><?= e((string) $convite['igreja_convidada']) ?></p>
+  <?php endif; ?>
+  <?php if ((string) ($convite['endereco'] ?? '') !== ''): ?>
+    <p class="convite-texto" style="white-space: pre-line"><?= e((string) $convite['endereco']) ?></p>
+  <?php endif; ?>
+
+  <p class="convite-texto" style="margin-top: 26px">
+    A paz do Senhor Jesus Cristo! Temos a alegria de convidar <?= e((string) ($convite['convidado'] ?? '')) ?>
+    para participar de <strong><?= e((string) ($convite['nome_evento'] ?? '')) ?></strong>,
+    promovido por <?= e($ministerio !== '' ? $ministerio : 'nossa congregação') ?>.
+  </p>
+
+  <div class="convite-dados">
+    <div><span>Evento</span><strong><?= e((string) ($convite['nome_evento'] ?? '')) ?></strong></div>
+    <div><span>Data</span><strong><?= e(format_date((string) ($convite['data_evento'] ?? ''), 'd/m/Y H:i')) ?></strong></div>
+    <div><span>Local</span><strong><?= e((string) ($convite['local'] ?? '') !== '' ? (string) $convite['local'] : 'A ser confirmado') ?></strong></div>
+    <?php if ((string) ($convite['pastor_responsavel'] ?? '') !== ''): ?>
+      <div><span>Responsável</span><strong><?= e((string) $convite['pastor_responsavel']) ?></strong></div>
+    <?php endif; ?>
+  </div>
+
+  <p class="convite-texto">Sua presença será uma grande bênção para nós. Aguardamos com alegria!</p>
+
+  <div class="convite-numero">Registro nº <?= e((string) ($convite['numero'] ?? '')) ?> · Emitido em <?= e(format_date((string) ($convite['emitido_em'] ?? ''), 'd/m/Y')) ?></div>
+
+  <div class="convite-assinaturas">
+    <?php if ($assinaturas === []): ?>
+      <div><span></span><small>Pastor responsável</small></div>
+    <?php else: ?>
+      <?php foreach ($assinaturas as $ass): ?>
+        <div><span></span><small><?= e($ass) ?></small></div>
+      <?php endforeach; ?>
+    <?php endif; ?>
+  </div>
+</section>
+
+<footer class="print-footer">
+  <span><?= e($ministerio !== '' ? $ministerio : 'Assembleia de Deus') ?><?= $enderecoMinisterio !== '' ? ' · ' . e($enderecoMinisterio) : '' ?></span>
+  <span><?= e(trim($cidade . ($estado !== '' ? ' - ' . $estado : ''))) ?></span>
+</footer>
