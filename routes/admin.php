@@ -2838,6 +2838,18 @@ return static function (Router $router): void {
         return redirect('admin/modulos/contato/' . (int) $id);
     }, [new CsrfMiddleware(), new PermissionMiddleware('contato', 'responder')]);
 
+    $router->post('/admin/modulos/contato/{id}/excluir', static function (string $id): Response {
+        $mensagem = ContatoRepository::buscar((int) $id);
+        if ($mensagem === null) {
+            throw new HttpException(404, 'A mensagem solicitada não foi encontrada.');
+        }
+
+        ContatoRepository::excluir((int) $id);
+        Audit::registrar('excluir', 'contato', 'contato_mensagens', (int) $id, $mensagem, null);
+        Session::flash('sucesso', 'Mensagem excluída com sucesso.');
+        return redirect('admin/modulos/contato');
+    }, [new CsrfMiddleware(), new PermissionMiddleware('contato', 'responder')]);
+
     $filtrosRelatorios = static function (Request $request): array {
         return RelatorioRepository::normalizarFiltros([
             'competencia' => (string) $request->query('competencia', ''),

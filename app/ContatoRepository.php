@@ -89,4 +89,12 @@ final class ContatoRepository
             [':id' => $id]
         );
     }
+
+    public static function excluir(int $id): void
+    {
+        Database::run(
+            'DELETE FROM `contato_mensagens` WHERE `id` = :id',
+            [':id' => $id]
+        );
+    }
 }
