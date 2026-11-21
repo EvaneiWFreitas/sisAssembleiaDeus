@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use App\Auth;
+use App\CarrosselRepository;
 use App\Database;
 use App\Csrf;
 use App\Exceptions\HttpException;
@@ -24,6 +25,9 @@ return static function (Router $router): void {
             'cultos' => SiteRepository::cultos(),
             'galeria' => SiteRepository::galeria(6),
             'palavra' => SiteRepository::palavra(),
+            'carrossel' => CarrosselRepository::ativos(),
+            'homeEyebrow' => SiteRepository::config('home_eyebrow', 'Bem-vindo à família'),
+            'homeDescricao' => SiteRepository::config('home_descricao', 'Um lugar de fé, esperança e comunhão. Acompanhe nossos cultos, eventos e notícias, e faça parte da família da igreja.'),
         ], 'inicio');
     });
 
@@ -138,6 +142,7 @@ return static function (Router $router): void {
         return Response::html(View::render('auth/login', [
             'titulo' => 'Acesso ao painel',
             'nomeIgreja' => SiteRepository::contexto()['nomeIgreja'],
+            'logotipo' => SiteRepository::logotipo(),
             'erro' => is_string($erro) ? $erro : '',
             'aviso' => is_string($aviso) ? $aviso : '',
             'email' => is_string($email) ? $email : '',

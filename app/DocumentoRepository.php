@@ -23,6 +23,24 @@ final class DocumentoRepository
         'institucional' => 'Institucional',
     ];
 
+    public const DADOS_JURIDICOS = [
+        'razao_social' => 'Razão social',
+        'cnpj' => 'CNPJ da igreja',
+        'inscricao_estadual' => 'Inscrição estadual',
+        'inscricao_municipal' => 'Inscrição municipal',
+        'alvara_funcionamento' => 'Alvará de funcionamento',
+        'registro_estatuto' => 'Registro do estatuto',
+    ];
+
+    private const DADOS_JURIDICOS_CONFIG = [
+        'razao_social' => 'ministerio_razao_social',
+        'cnpj' => 'ministerio_cnpj',
+        'inscricao_estadual' => 'ministerio_inscricao_estadual',
+        'inscricao_municipal' => 'ministerio_inscricao_municipal',
+        'alvara_funcionamento' => 'ministerio_alvara_funcionamento',
+        'registro_estatuto' => 'ministerio_registro_estatuto',
+    ];
+
     /** @param array<string, mixed> $filtros @return list<array<string, mixed>> */
     public static function convites(array $filtros = []): array
     {
@@ -112,6 +130,12 @@ final class DocumentoRepository
             'pastor_responsavel' => 'max:180',
             'assinaturas' => 'max:1000',
             'modelo' => 'required|in:' . implode(',', array_keys(self::MODELOS)),
+            'razao_social' => 'max:180',
+            'cnpj' => 'max:18',
+            'inscricao_estadual' => 'max:80',
+            'inscricao_municipal' => 'max:80',
+            'alvara_funcionamento' => 'max:80',
+            'registro_estatuto' => 'max:80',
         ];
     }
 
@@ -222,6 +246,21 @@ final class DocumentoRepository
         return $registro === false ? null : $registro;
     }
 
+    /** @return array<string, mixed>|null */
+    public static function buscarDocumentoPorConvite(int $conviteId): ?array
+    {
+        $registro = Database::run(
+            'SELECT d.*, u.`nome` AS `emitido_por_nome`
+             FROM `documentos_emitidos` d
+             LEFT JOIN `usuarios` u ON u.`id` = d.`emitido_por_id`
+             WHERE d.`tipo` = :tipo AND d.`referencia_id` = :ref
+             ORDER BY d.`id` DESC LIMIT 1',
+            [':tipo' => 'carta_convite', ':ref' => $conviteId]
+        )->fetch();
+
+        return $registro === false ? null : $registro;
+    }
+
     /** @param array<string, mixed> $dados */
     public static function registrar(
         string $tipo,
@@ -301,10 +340,10 @@ final class DocumentoRepository
         return $linha === false ? [] : $linha;
     }
 
-    /** @param array<string, mixed> $convite @return array<string, mixed> */
-    public static function dadosConvite(array $convite): array
+    /** @param array<string, mixed> $convite @param array<string, mixed> $dados @return array<string, mixed> */
+    public static function dadosConvite(array $convite, array $dados = []): array
     {
-        return [
+        $registro = [
             'numero' => (string) ($convite['numero'] ?? ''),
             'convidado' => (string) ($convite['convidado'] ?? ''),
             'igreja_convidada' => (string) ($convite['igreja_convidada'] ?? ''),
@@ -316,6 +355,12 @@ final class DocumentoRepository
             'assinaturas' => (string) ($convite['assinaturas'] ?? ''),
             'modelo' => (string) ($convite['modelo'] ?? 'classico'),
         ];
+
+        foreach (array_keys(self::DADOS_JURIDICOS) as $campo) {
+            $registro[$campo] = (string) ($dados[$campo] ?? '');
+        }
+
+        return $registro;
     }
 
     /** @return array<string, mixed> */
@@ -344,11 +389,32 @@ final class DocumentoRepository
         return SiteRepository::config($chave, $padrao);
     }
 
-    /** @param array<string, mixed> $convite @return array<string, string> */
-    public static function valoresFormulario(array $convite): array
+    /** @return array<string, string> */
+    public static function dadosJuridicos(): array
+    {
+        return self::DADOS_JURIDICOS;
+    }
+
+    public static function valorJuridicoPadrao(string $campo): string
+    {
+        $chave = self::DADOS_JURIDICOS_CONFIG[$campo] ?? '';
+        if ($chave === '') {
+            return '';
+        }
+
+        $valor = self::configuracao($chave, '');
+        if ($campo === 'razao_social' && $valor === '') {
+            return self::configuracao('ministerio_nome', 'Assembleia de Deus');
+        }
+
+        return $valor;
+    }
+
+    /** @param array<string, mixed> $convite @param array<string, mixed> $dados @return array<string, string> */
+    public static function valoresFormulario(array $convite, array $dados = []): array
     {
         $data = (string) ($convite['data_evento'] ?? '');
-        return [
+        $valores = [
             'convidado' => (string) ($convite['convidado'] ?? ''),
             'igreja_convidada' => (string) ($convite['igreja_convidada'] ?? ''),
             'endereco' => (string) ($convite['endereco'] ?? ''),
@@ -359,6 +425,12 @@ final class DocumentoRepository
             'assinaturas' => (string) ($convite['assinaturas'] ?? ''),
             'modelo' => (string) ($convite['modelo'] ?? 'classico'),
         ];
+
+        foreach (array_keys(self::DADOS_JURIDICOS) as $campo) {
+            $valores[$campo] = (string) ($dados[$campo] ?? '');
+        }
+
+        return $valores;
     }
 
     private static function dataValida(string $valor): bool

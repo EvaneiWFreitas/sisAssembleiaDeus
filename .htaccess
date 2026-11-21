@@ -1,11 +1,11 @@
-# sisAssembleiaDeus — ambiente local (XAMPP)
+# sisAssembleiaDeus — producao (FREEHOST)
 # Todas as requisicoes entram por public/index.php.
 DirectoryIndex index.php
 Options -Indexes
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /sisAssembleiaDeus/
+    RewriteBase /
 
     # Nega acesso HTTP direto a diretorios internos
     RewriteRule ^(config|app|database|routes|storage|docs)(/|$) - [F,L]
@@ -23,5 +23,5 @@ Options -Indexes
 </IfModule>
 
 <IfModule !mod_rewrite.c>
-    ErrorDocument 404 /sisAssembleiaDeus/index.php
+    ErrorDocument 404 /index.php
 </IfModule>

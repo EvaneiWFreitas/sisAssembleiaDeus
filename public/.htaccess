@@ -3,7 +3,7 @@ Options -Indexes
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /sisAssembleiaDeus/public/
+    RewriteBase /public/
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^(.*)$ index.php?rota=$1 [QSA,L]
@@ -14,10 +14,4 @@ Options -Indexes
     <FilesMatch "^(?!index\.php$).*\.(php|phtml|phar|ini|log|sql|env|bak|sh|json)$">
         Require all denied
     </FilesMatch>
-</IfModule>
-
-<IfModule mod_headers.c>
-    Header set X-Content-Type-Options "nosniff"
-    Header set X-Frame-Options "SAMEORIGIN"
-    Header set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>

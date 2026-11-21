@@ -4,7 +4,7 @@
       <div class="col-lg-4">
         <div class="d-flex align-items-center gap-3 mb-3">
           <span class="brand-mark">
-            <img src="<?= e(asset('img/logo-assembleia.svg')) ?>" alt="">
+            <img src="<?= e($logotipo ?? \App\SiteRepository::logotipo()) ?>" alt="">
           </span>
           <span class="brand-title text-white d-block"><?= e($nomeIgreja) ?></span>
         </div>

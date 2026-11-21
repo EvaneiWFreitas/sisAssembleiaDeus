@@ -1,6 +1,6 @@
 <div class="auth-card">
   <div class="auth-brand">
-    <img src="<?= e(asset('img/logo-assembleia.svg')) ?>" alt="">
+    <img src="<?= e($logotipo ?? \App\SiteRepository::logotipo()) ?>" alt="">
     <div>
       <strong><?= e($nomeIgreja ?? 'Assembleia de Deus') ?></strong>
       <small>sisAssembleiaDeus</small>

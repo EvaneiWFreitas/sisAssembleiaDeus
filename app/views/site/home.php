@@ -13,24 +13,76 @@ $resumoPalavra = (string) ($palavra['texto'] ?? '');
 if (mb_strlen($resumoPalavra) > 360) {
     $resumoPalavra = mb_substr($resumoPalavra, 0, 357) . '...';
 }
+
+$eyebrowCarrossel = (string) ($homeEyebrow ?? 'Bem-vindo à família');
+$descricaoCarrossel = (string) ($homeDescricao ?? 'Um lugar de fé, esperança e comunhão. Acompanhe nossos cultos, eventos e notícias, e faça parte da família da igreja.');
+$slidesCarrossel = [];
+foreach (($carrossel ?? []) as $slideCarrossel) {
+    $imagemCarrossel = trim((string) ($slideCarrossel['imagem'] ?? ''));
+    if ($imagemCarrossel === '') {
+        continue;
+    }
+    $slidesCarrossel[] = [
+        'titulo' => trim((string) ($slideCarrossel['titulo'] ?? '')) !== '' ? (string) $slideCarrossel['titulo'] : (string) $nomeIgreja,
+        'descricao' => trim((string) ($slideCarrossel['descricao'] ?? '')) !== '' ? (string) $slideCarrossel['descricao'] : $descricaoCarrossel,
+        'imagem' => str_starts_with($imagemCarrossel, 'uploads/') ? upload_url($imagemCarrossel) : $imagemCarrossel,
+    ];
+}
+if ($slidesCarrossel === []) {
+    $slidesCarrossel[] = [
+        'titulo' => (string) $nomeIgreja,
+        'descricao' => $descricaoCarrossel,
+        'imagem' => asset('img/hero-igreja.svg'),
+    ];
+}
+$totalSlidesCarrossel = count($slidesCarrossel);
 ?>
-<section class="hero">
-  <div class="container">
-    <div class="row align-items-center">
-      <div class="col-lg-8">
-        <span class="hero-eyebrow">Bem-vindo à família</span>
-        <h1><?= e($nomeIgreja) ?></h1>
-        <p>Um lugar de fé, esperança e comunhão. Acompanhe nossos cultos, eventos e notícias, e faça parte da família da igreja.</p>
-        <div class="hero-actions">
-          <a class="btn btn-site" href="<?= e(url('/cultos')) ?>"><i class="fa-solid fa-calendar-days me-2"></i>Ver programação</a>
-          <a class="btn btn-outline-site" href="<?= e(url('/contato')) ?>"><i class="fa-solid fa-comments me-2"></i>Fale conosco</a>
-        </div>
-        <div class="verse-box">
-          <p>“<?= e($versiculo['texto'] ?? '') ?>”</p>
-          <span>— <?= e($versiculo['referencia'] ?? '') ?></span>
-        </div>
+<section class="hero hero-carousel">
+  <div class="carousel slide carousel-fade" id="carrosselHome" data-bs-ride="carousel" data-bs-interval="6500" data-bs-pause="hover">
+    <?php if ($totalSlidesCarrossel > 1): ?>
+      <div class="carousel-indicators">
+        <?php for ($indicadorCarrossel = 0; $indicadorCarrossel < $totalSlidesCarrossel; $indicadorCarrossel++): ?>
+          <button type="button" data-bs-target="#carrosselHome" data-bs-slide-to="<?= $indicadorCarrossel ?>" class="<?= $indicadorCarrossel === 0 ? 'active' : '' ?>" <?= $indicadorCarrossel === 0 ? 'aria-current="true"' : '' ?> aria-label="Slide <?= $indicadorCarrossel + 1 ?>"></button>
+        <?php endfor; ?>
       </div>
+    <?php endif; ?>
+
+    <div class="carousel-inner">
+      <?php foreach ($slidesCarrossel as $indiceCarrossel => $slideCarrossel): ?>
+        <div class="carousel-item hero-slide <?= $indiceCarrossel === 0 ? 'active' : '' ?>" style="background-image: linear-gradient(90deg, rgba(6, 24, 48, 0.94) 0%, rgba(6, 24, 48, 0.82) 45%, rgba(6, 24, 48, 0.55) 100%), url('<?= e($slideCarrossel['imagem']) ?>');">
+          <div class="container">
+            <div class="row align-items-center g-4">
+              <div class="col-lg-7">
+                <span class="hero-eyebrow"><?= e($eyebrowCarrossel) ?></span>
+                <h1><?= e($slideCarrossel['titulo']) ?></h1>
+                <p><?= e($slideCarrossel['descricao']) ?></p>
+                <div class="hero-actions">
+                  <a class="btn btn-site" href="<?= e(url('/cultos')) ?>"><i class="fa-solid fa-calendar-days me-2"></i>Ver programação</a>
+                  <a class="btn btn-outline-site" href="<?= e(url('/contato')) ?>"><i class="fa-solid fa-comments me-2"></i>Fale conosco</a>
+                </div>
+              </div>
+              <div class="col-lg-5">
+                <div class="verse-box">
+                  <p>“<?= e($versiculo['texto'] ?? '') ?>”</p>
+                  <span>— <?= e($versiculo['referencia'] ?? '') ?></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      <?php endforeach; ?>
     </div>
+
+    <?php if ($totalSlidesCarrossel > 1): ?>
+      <button class="carousel-control-prev" type="button" data-bs-target="#carrosselHome" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Anterior</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#carrosselHome" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Próximo</span>
+      </button>
+    <?php endif; ?>
   </div>
 </section>
 

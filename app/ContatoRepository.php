@@ -53,6 +53,7 @@ final class ContatoRepository
         $linha = Database::run(
             'SELECT COUNT(*) AS `total`,
                     SUM(`lida` = 0) AS `nao_lidas`,
+                    SUM(`lida` = 1) AS `lidas`,
                     SUM(`respondida_em` IS NOT NULL) AS `respondidas`
                FROM `contato_mensagens`'
         )->fetch();
@@ -60,6 +61,7 @@ final class ContatoRepository
         return [
             'total' => (int) ($linha['total'] ?? 0),
             'nao_lidas' => (int) ($linha['nao_lidas'] ?? 0),
+            'lidas' => (int) ($linha['lidas'] ?? 0),
             'respondidas' => (int) ($linha['respondidas'] ?? 0),
         ];
     }
@@ -88,5 +90,20 @@ final class ContatoRepository
             'UPDATE `contato_mensagens` SET `respondida_em` = NULL WHERE `id` = :id',
             [':id' => $id]
         );
+    }
+
+    public static function excluir(int $id): void
+    {
+        Database::run(
+            'DELETE FROM `contato_mensagens` WHERE `id` = :id',
+            [':id' => $id]
+        );
+    }
+
+    public static function excluirLidas(): int
+    {
+        return Database::run(
+            'DELETE FROM `contato_mensagens` WHERE `lida` = 1'
+        )->rowCount();
     }
 }

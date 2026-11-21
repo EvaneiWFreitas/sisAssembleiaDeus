@@ -33,7 +33,7 @@ $validade = (string) ($carteirinha['validade'] ?? '');
 
 <section class="carteirinha-paper carteirinha-<?= e($modelo) ?>">
   <header class="carteirinha-cabecalho">
-    <img src="<?= e(asset('img/logo-assembleia.svg')) ?>" alt="">
+    <img src="<?= e($logotipo ?? \App\SiteRepository::logotipo()) ?>" alt="">
     <div>
       <strong><?= e($ministerio !== '' ? $ministerio : 'Assembleia de Deus') ?></strong>
       <small>Carteirinha de <?= e(\App\CarteirinhaRepository::rotuloTipo((string) ($carteirinha['tipo'] ?? 'membro'))) ?></small>
@@ -58,7 +58,13 @@ $validade = (string) ($carteirinha['validade'] ?? '');
     <div class="carteirinha-codigo">Validação: <?= e($codigo) ?></div>
   <?php endif; ?>
 
-  <div class="carteirinha-assinatura"><span>Pastor responsável</span></div>
+  <div class="carteirinha-assinatura">
+    <?php $assinaturaImagem = $assinaturaPastor ?? \App\SiteRepository::assinaturaPastor(); ?>
+    <?php if ($assinaturaImagem !== ''): ?>
+      <img src="<?= e($assinaturaImagem) ?>" alt="Assinatura do pastor" style="height:34px;max-width:100%;object-fit:contain;">
+    <?php endif; ?>
+    <span>Pastor responsável</span>
+  </div>
 </section>
 
 <footer class="print-footer">

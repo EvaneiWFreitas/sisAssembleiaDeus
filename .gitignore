@@ -1,4 +1,5 @@
 # Credenciais e dados sensiveis
+/.env
 /config/.env
 /config/*.local.php
 /storage/logs/*

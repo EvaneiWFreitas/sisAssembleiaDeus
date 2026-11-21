@@ -37,6 +37,12 @@ $indicadores = [
       <h5 class="mb-0">Mensagens recebidas</h5>
       <div class="small text-muted">Mensagens enviadas pelo formulário de contato do site.</div>
     </div>
+    <?php if ($podeResponder && (int) ($estatisticas['lidas'] ?? 0) > 0): ?>
+      <form method="post" action="<?= e($base . '/excluir-lidas') ?>" onsubmit="return confirm('Excluir todas as mensagens lidas? Esta ação não pode ser desfeita.');">
+        <?= csrf_field() ?>
+        <button class="btn btn-sm btn-outline-danger rounded-pill" type="submit"><i class="fa-solid fa-trash me-1"></i>Excluir lidas (<?= (int) $estatisticas['lidas'] ?>)</button>
+      </form>
+    <?php endif; ?>
   </div>
 
   <form class="row g-2 align-items-center mb-3" method="get" action="<?= e($base) ?>">
@@ -81,8 +87,8 @@ $indicadores = [
                 <div class="small text-muted"><?= e((string) $mensagem['email']) ?></div>
               </td>
               <td>
-                <div class="fw-semibold"><?= e((string) ($mensagem['assunto'] !== '' ? $mensagem['assunto'] : 'Sem assunto')) ?></div>
-                <div class="small text-muted"><?= e($resumo((string) $mensagem['mensagem'])) ?></div>
+                <div class="fw-semibold text-break-anywhere"><?= e((string) ($mensagem['assunto'] !== '' ? $mensagem['assunto'] : 'Sem assunto')) ?></div>
+                <div class="small text-muted text-break-anywhere"><?= e($resumo((string) $mensagem['mensagem'])) ?></div>
               </td>
               <td><?= e(format_date((string) $mensagem['created_at'])) ?></td>
               <td>
@@ -93,6 +99,12 @@ $indicadores = [
               </td>
               <td class="text-end">
                 <a class="btn btn-sm btn-outline-primary" href="<?= e($base . '/' . $id) ?>" title="Ver detalhes"><i class="fa-solid fa-eye"></i></a>
+                <?php if ($podeResponder && (int) $mensagem['lida'] === 1): ?>
+                  <form class="d-inline" method="post" action="<?= e($base . '/' . $id . '/excluir') ?>" onsubmit="return confirm('Excluir esta mensagem lida? Esta ação não pode ser desfeita.');">
+                    <?= csrf_field() ?>
+                    <button class="btn btn-sm btn-outline-danger" type="submit" title="Excluir mensagem lida"><i class="fa-solid fa-trash"></i></button>
+                  </form>
+                <?php endif; ?>
                 <?php if ($podeResponder): ?>
                   <?php if ((int) $mensagem['lida'] === 0): ?>
                     <form class="d-inline" method="post" action="<?= e($base . '/' . $id . '/lida') ?>">

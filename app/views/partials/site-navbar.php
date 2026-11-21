@@ -3,7 +3,7 @@
     <div class="container">
       <a class="navbar-brand d-flex align-items-center gap-3" href="<?= e(url('/')) ?>">
         <span class="brand-mark">
-          <img src="<?= e(asset('img/logo-assembleia.svg')) ?>" alt="">
+          <img src="<?= e($logotipo ?? \App\SiteRepository::logotipo()) ?>" alt="">
         </span>
         <span>
           <span class="brand-title d-block"><?= e($nomeIgreja) ?></span>

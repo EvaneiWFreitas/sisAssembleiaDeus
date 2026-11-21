@@ -1,14 +1,3 @@
-Options -Indexes -ExecCGI
-
-# Impede execucao de PHP dentro da pasta de uploads
-<IfModule mod_php.c>
-    php_flag engine off
-</IfModule>
-
-<IfModule mod_mime.c>
-    AddType text/plain .php .phtml .phar .php5 .php7
-</IfModule>
-
 <IfModule mod_authz_core.c>
     <FilesMatch "\.(php|phtml|phar|php[0-9]|pl|cgi|py|sh|exe|sql|ini|env)$">
         Require all denied

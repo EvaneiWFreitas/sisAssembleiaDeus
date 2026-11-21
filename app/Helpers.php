@@ -37,14 +37,25 @@ if (!function_exists('url')) {
 if (!function_exists('asset')) {
     function asset(string $caminho): string
     {
-        return url('assets/' . ltrim($caminho, '/'));
+        return url('public/assets/' . ltrim($caminho, '/'));
     }
 }
 
 if (!function_exists('upload_url')) {
     function upload_url(string $caminho): string
     {
-        return url(ltrim($caminho, '/'));
+        $caminho = ltrim($caminho, '/');
+        if ($caminho === '') {
+            return '';
+        }
+        if (preg_match('#^(https?:)?//#i', $caminho) === 1) {
+            return $caminho;
+        }
+        if (str_starts_with($caminho, 'public/')) {
+            return url($caminho);
+        }
+
+        return url('public/' . $caminho);
     }
 }
 

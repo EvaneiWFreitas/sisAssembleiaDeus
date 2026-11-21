@@ -15,6 +15,8 @@ final class AdminRepository
 
         return [
             'usuario' => $usuario,
+            'logotipo' => SiteRepository::logotipo(),
+            'assinaturaPastor' => SiteRepository::assinaturaPastor(),
             'perfilNome' => self::perfilNome($perfilId),
             'permissoes' => Permission::all(),
             'modulos' => self::modulos(),
@@ -37,6 +39,7 @@ final class AdminRepository
             'sacramentos' => ['modulo' => 'sacramentos', 'acao' => 'ver', 'grupo' => 'Ministerial', 'nome' => 'Sacramentos', 'icone' => 'fa-water', 'descricao' => 'Batismos e consagrações registrados.'],
             'documentos' => ['modulo' => 'documentos', 'acao' => 'ver', 'grupo' => 'Ministerial', 'nome' => 'Documentos', 'icone' => 'fa-file-lines', 'descricao' => 'Cartas-convite, diplomas e documentos emitidos.'],
             'carteirinhas' => ['modulo' => 'carteirinhas', 'acao' => 'ver', 'grupo' => 'Ministerial', 'nome' => 'Carteirinhas', 'icone' => 'fa-id-card', 'descricao' => 'Emissão e validação de carteirinhas.'],
+            'carrossel' => ['modulo' => 'carrossel', 'acao' => 'ver', 'grupo' => 'Conteúdo', 'nome' => 'Carrossel', 'icone' => 'fa-images', 'descricao' => 'Imagens de fundo e textos da página inicial.'],
             'eventos' => ['modulo' => 'eventos', 'acao' => 'ver', 'grupo' => 'Conteúdo', 'nome' => 'Eventos', 'icone' => 'fa-calendar-days', 'descricao' => 'Agenda e publicação de eventos.'],
             'noticias' => ['modulo' => 'noticias', 'acao' => 'ver', 'grupo' => 'Conteúdo', 'nome' => 'Notícias', 'icone' => 'fa-newspaper', 'descricao' => 'Notícias publicadas no site institucional.'],
             'galeria' => ['modulo' => 'galeria', 'acao' => 'ver', 'grupo' => 'Conteúdo', 'nome' => 'Galeria', 'icone' => 'fa-images', 'descricao' => 'Fotografias da comunidade.'],

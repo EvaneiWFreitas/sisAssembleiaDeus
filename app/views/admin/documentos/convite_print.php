@@ -1,8 +1,28 @@
 <?php
 $ministerio = \App\DocumentoRepository::configuracao('ministerio_nome', 'Assembleia de Deus');
-$enderecoMinisterio = \App\DocumentoRepository::configuracao('ministerio_endereco', '');
-$cidade = \App\DocumentoRepository::configuracao('ministerio_cidade', '');
-$estado = \App\DocumentoRepository::configuracao('ministerio_estado', '');
+$dados = isset($dados) && is_array($dados) ? $dados : [];
+$dadosJuridicos = [];
+foreach (\App\DocumentoRepository::dadosJuridicos() as $campo => $rotulo) {
+    $valor = (string) ($dados[$campo] ?? '');
+    $dadosJuridicos[$campo] = $valor !== '' ? $valor : \App\DocumentoRepository::valorJuridicoPadrao($campo);
+}
+$nomeTimbrado = $dadosJuridicos['razao_social'] !== ''
+    ? $dadosJuridicos['razao_social']
+    : ($ministerio !== '' ? $ministerio : 'Assembleia de Deus');
+$enderecoPartes = [];
+foreach (['ministerio_endereco', 'ministerio_numero', 'ministerio_complemento', 'ministerio_bairro', 'ministerio_cidade', 'ministerio_estado', 'ministerio_cep'] as $chaveEndereco) {
+    $valorEndereco = \App\DocumentoRepository::configuracao($chaveEndereco, '');
+    if ($valorEndereco !== '') {
+        $enderecoPartes[] = $valorEndereco;
+    }
+}
+$enderecoCompleto = implode(', ', $enderecoPartes);
+$documentosTimbrado = [];
+foreach (['cnpj' => 'CNPJ', 'inscricao_estadual' => 'IE', 'inscricao_municipal' => 'IM', 'alvara_funcionamento' => 'Alvará', 'registro_estatuto' => 'Estatuto'] as $campo => $rotuloCurto) {
+    if ($dadosJuridicos[$campo] !== '') {
+        $documentosTimbrado[] = $rotuloCurto . ': ' . $dadosJuridicos[$campo];
+    }
+}
 $assinaturas = array_values(array_filter(array_map('trim', explode(',', (string) ($convite['assinaturas'] ?? ''))), static fn (string $item): bool => $item !== ''));
 $modelo = preg_replace('/[^a-z]/', '', (string) ($convite['modelo'] ?? 'classico')) ?: 'classico';
 ?>
@@ -10,6 +30,10 @@ $modelo = preg_replace('/[^a-z]/', '', (string) ($convite['modelo'] ?? 'classico
   .convite-paper { border: 3px double #c9a227; min-height: 560px; padding: 38px; position: relative; }
   .convite-paper.convite-moderno { border: 0; border-left: 10px solid #0b2545; }
   .convite-paper.convite-institucional { border: 1px solid #0b2545; border-top: 8px solid #0b2545; }
+  .print-top .timbrado { flex: 1; }
+  .timbrado-endereco { color: #475569; font-size: .72rem; margin-top: 3px; }
+  .timbrado-documentos { color: #64748b; font-size: .7rem; line-height: 1.4; margin-top: 3px; }
+  .print-documentos { color: #64748b; font-size: .72rem; line-height: 1.4; margin-top: 8px; }
   .convite-eyebrow { color: #64748b; font-size: .76rem; letter-spacing: .14em; text-transform: uppercase; }
   .convite-paper h1 { color: #0b2545; font-size: 1.7rem; margin: 8px 0 26px; }
   .convite-texto { font-size: 1rem; line-height: 1.7; margin: 0 0 14px; }
@@ -24,10 +48,16 @@ $modelo = preg_replace('/[^a-z]/', '', (string) ($convite['modelo'] ?? 'classico
   .convite-assinaturas small { color: #64748b; }
 </style>
 <header class="print-top">
-  <img src="<?= e(asset('img/logo-assembleia.svg')) ?>" alt="">
-  <div>
-    <strong><?= e($ministerio !== '' ? $ministerio : 'Assembleia de Deus') ?></strong>
+  <img src="<?= e($logotipo ?? \App\SiteRepository::logotipo()) ?>" alt="">
+  <div class="timbrado">
+    <strong><?= e($nomeTimbrado) ?></strong>
     <small>sisAssembleiaDeus · Correspondência eclesiástica</small>
+    <?php if ($enderecoCompleto !== ''): ?>
+      <div class="timbrado-endereco"><?= e($enderecoCompleto) ?></div>
+    <?php endif; ?>
+    <?php if ($documentosTimbrado !== []): ?>
+      <div class="timbrado-documentos"><?= e(implode(' · ', $documentosTimbrado)) ?></div>
+    <?php endif; ?>
   </div>
 </header>
 
@@ -47,7 +77,7 @@ $modelo = preg_replace('/[^a-z]/', '', (string) ($convite['modelo'] ?? 'classico
   <p class="convite-texto" style="margin-top: 26px">
     A paz do Senhor Jesus Cristo! Temos a alegria de convidar <?= e((string) ($convite['convidado'] ?? '')) ?>
     para participar de <strong><?= e((string) ($convite['nome_evento'] ?? '')) ?></strong>,
-    promovido por <?= e($ministerio !== '' ? $ministerio : 'nossa congregação') ?>.
+    promovido por <?= e($nomeTimbrado) ?>.
   </p>
 
   <div class="convite-dados">
@@ -64,7 +94,10 @@ $modelo = preg_replace('/[^a-z]/', '', (string) ($convite['modelo'] ?? 'classico
   <div class="convite-numero">Registro nº <?= e((string) ($convite['numero'] ?? '')) ?> · Emitido em <?= e(format_date((string) ($convite['emitido_em'] ?? ''), 'd/m/Y')) ?></div>
 
   <div class="convite-assinaturas">
-    <?php if ($assinaturas === []): ?>
+    <?php $assinaturaImagem = $assinaturaPastor ?? \App\SiteRepository::assinaturaPastor(); ?>
+    <?php if ($assinaturaImagem !== ''): ?>
+      <div><img src="<?= e($assinaturaImagem) ?>" alt="Assinatura do pastor" style="height:48px;max-width:100%;object-fit:contain;"><small>Pastor responsável</small></div>
+    <?php elseif ($assinaturas === []): ?>
       <div><span></span><small>Pastor responsável</small></div>
     <?php else: ?>
       <?php foreach ($assinaturas as $ass): ?>
@@ -75,6 +108,9 @@ $modelo = preg_replace('/[^a-z]/', '', (string) ($convite['modelo'] ?? 'classico
 </section>
 
 <footer class="print-footer">
-  <span><?= e($ministerio !== '' ? $ministerio : 'Assembleia de Deus') ?><?= $enderecoMinisterio !== '' ? ' · ' . e($enderecoMinisterio) : '' ?></span>
-  <span><?= e(trim($cidade . ($estado !== '' ? ' - ' . $estado : ''))) ?></span>
+  <span><?= e($nomeTimbrado) ?></span>
+  <span><?= e($enderecoCompleto) ?></span>
 </footer>
+<?php if ($documentosTimbrado !== []): ?>
+  <div class="print-documentos">Documentos: <?= e(implode(' · ', $documentosTimbrado)) ?></div>
+<?php endif; ?>

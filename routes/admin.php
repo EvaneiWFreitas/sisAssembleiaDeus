@@ -8,6 +8,7 @@ use App\AuditoriaRepository;
 use App\Auth;
 use App\BackupRepository;
 use App\CarteirinhaRepository;
+use App\CarrosselRepository;
 use App\ConfiguracaoRepository;
 use App\ContatoRepository;
 use App\DocumentoRepository;
@@ -1516,7 +1517,9 @@ return static function (Router $router): void {
         }
 
         $estado = $estadoFormulario();
-        $valores = $estado['valores'] === [] ? DocumentoRepository::valoresFormulario($convite) : $estado['valores'];
+        $documento = DocumentoRepository::buscarDocumentoPorConvite((int) $id);
+        $dadosDocumento = $documento === null ? [] : DocumentoRepository::dadosDocumento($documento);
+        $valores = $estado['valores'] === [] ? DocumentoRepository::valoresFormulario($convite, $dadosDocumento) : $estado['valores'];
         return admin_view('admin/documentos/form', [
             'titulo' => 'Editar convite',
             'subtitulo' => 'Atualize os dados e reemita o documento.',
@@ -1532,9 +1535,13 @@ return static function (Router $router): void {
             throw new HttpException(404, 'O convite solicitado não foi encontrado.');
         }
 
+        $documento = DocumentoRepository::buscarDocumentoPorConvite((int) $id);
+        $dados = $documento === null ? [] : DocumentoRepository::dadosDocumento($documento);
+
         return Response::html(View::render('admin/documentos/convite_print', [
             'titulo' => 'Carta-convite nº ' . (string) $convite['numero'],
             'convite' => $convite,
+            'dados' => $dados,
         ], 'layouts/print'));
     }, [new PermissionMiddleware('documentos', 'ver')]);
 
@@ -1553,7 +1560,7 @@ return static function (Router $router): void {
             $id,
             (string) $convite['numero'],
             (string) $validacao['data']['modelo'],
-            DocumentoRepository::dadosConvite($convite)
+            DocumentoRepository::dadosConvite($convite, $validacao['data'])
         );
         Audit::registrar('criar', 'documentos', 'convites', $id, null, $validacao['data']);
         Audit::registrar('emitir', 'documentos', 'documentos_emitidos', $documentoId, null, $convite['numero']);
@@ -1601,7 +1608,7 @@ return static function (Router $router): void {
             (int) $id,
             (string) $atualizado['numero'],
             (string) $validacao['data']['modelo'],
-            DocumentoRepository::dadosConvite($atualizado)
+            DocumentoRepository::dadosConvite($atualizado, $validacao['data'])
         );
         Audit::registrar('editar', 'documentos', 'convites', (int) $id, $convite, $validacao['data']);
         Audit::registrar('emitir', 'documentos', 'documentos_emitidos', $documentoId, null, $atualizado['numero']);
@@ -2165,6 +2172,199 @@ return static function (Router $router): void {
         Session::flash('sucesso', 'Notícia excluída com sucesso.');
         return redirect('admin/modulos/noticias');
     }, [new CsrfMiddleware(), new PermissionMiddleware('noticias', 'excluir')]);
+
+    $carrosselImagem = static function (Request $request, string $prefixo): array {
+        $arquivo = $request->file('imagem');
+        if ($arquivo === null || (int) ($arquivo['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+            return ['caminho' => null, 'erro' => null];
+        }
+
+        try {
+            return ['caminho' => Upload::image($arquivo, 'carrossel', $prefixo), 'erro' => null];
+        } catch (Throwable $exception) {
+            return ['caminho' => null, 'erro' => $exception->getMessage()];
+        }
+    };
+
+    $carrosselTextos = static function (): array {
+        $valores = ConfiguracaoRepository::valores(ConfiguracaoRepository::listar());
+
+        return [
+            'home_eyebrow' => (string) ($valores['home_eyebrow'] ?? 'Bem-vindo à família'),
+            'home_descricao' => (string) ($valores['home_descricao'] ?? 'Um lugar de fé, esperança e comunhão. Acompanhe nossos cultos, eventos e notícias, e faça parte da família da igreja.'),
+        ];
+    };
+
+    $carrosselPadrao = static function (): array {
+        return [
+            'titulo' => '',
+            'descricao' => '',
+            'ordem' => (string) CarrosselRepository::proximaOrdem(),
+            'ativo' => '1',
+            'imagem' => '',
+        ];
+    };
+
+    $router->get('/admin/modulos/carrossel', static function () use ($carrosselTextos): Response {
+        return admin_view('admin/carrossel/index', [
+            'titulo' => 'Carrossel',
+            'subtitulo' => 'Gerencie as imagens de fundo e os textos exibidos na página inicial.',
+            'fotos' => CarrosselRepository::listar(),
+            'estatisticas' => CarrosselRepository::estatisticas(),
+            'textos' => $carrosselTextos(),
+        ], 'carrossel', 'carrossel', 'ver');
+    }, [new PermissionMiddleware('carrossel', 'ver')]);
+
+    $router->post('/admin/modulos/carrossel/textos', static function (Request $request) use ($carrosselTextos): Response {
+        $anteriores = $carrosselTextos();
+        $eyebrow = trim((string) $request->post('home_eyebrow', $anteriores['home_eyebrow']));
+        $descricao = trim((string) $request->post('home_descricao', $anteriores['home_descricao']));
+        $erros = [];
+        if (mb_strlen($eyebrow) > 150) {
+            $erros[] = 'O texto em destaque deve ter no máximo 150 caracteres.';
+        }
+        if (mb_strlen($descricao) > 255) {
+            $erros[] = 'A descrição do carrossel deve ter no máximo 255 caracteres.';
+        }
+        if ($erros !== []) {
+            Session::flash('erro', implode(' ', $erros));
+            return redirect('admin/modulos/carrossel');
+        }
+
+        $novos = ['home_eyebrow' => $eyebrow, 'home_descricao' => $descricao];
+        ConfiguracaoRepository::salvarChaves($novos);
+        Audit::registrar('editar', 'carrossel', 'carrossel', 0, $anteriores, $novos);
+        Session::flash('sucesso', 'Textos do carrossel atualizados com sucesso.');
+        return redirect('admin/modulos/carrossel');
+    }, [new CsrfMiddleware(), new PermissionMiddleware('carrossel', 'editar')]);
+
+    $router->get('/admin/modulos/carrossel/novo', static function () use ($estadoFormulario, $carrosselPadrao): Response {
+        $estado = $estadoFormulario();
+        return admin_view('admin/carrossel/form', [
+            'titulo' => 'Adicionar imagem de fundo',
+            'subtitulo' => 'Envie a imagem de fundo e defina o texto deste slide.',
+            'foto' => null,
+            'valores' => $estado['valores'] === [] ? $carrosselPadrao() : $estado['valores'],
+            'erros' => $estado['erros'],
+        ], 'carrossel', 'carrossel', 'criar');
+    }, [new PermissionMiddleware('carrossel', 'criar')]);
+
+    $router->get('/admin/modulos/carrossel/{id}/editar', static function (string $id) use ($estadoFormulario): Response {
+        $foto = CarrosselRepository::buscar((int) $id);
+        if ($foto === null) {
+            throw new HttpException(404, 'A imagem de fundo solicitada não foi encontrada.');
+        }
+
+        $estado = $estadoFormulario();
+        return admin_view('admin/carrossel/form', [
+            'titulo' => 'Editar imagem de fundo',
+            'subtitulo' => 'Atualize o texto, a ordem e a imagem deste slide.',
+            'foto' => $foto,
+            'valores' => $estado['valores'] === [] ? CarrosselRepository::valoresFormulario($foto) : $estado['valores'],
+            'erros' => $estado['erros'],
+        ], 'carrossel', 'carrossel', 'editar');
+    }, [new PermissionMiddleware('carrossel', 'editar')]);
+
+    $router->post('/admin/modulos/carrossel', static function (Request $request) use ($carrosselImagem): Response {
+        $imagem = $carrosselImagem($request, 'carrossel');
+        $validacao = Validator::validate($request->post(), CarrosselRepository::regras());
+        $erros = $validacao['errors'];
+        if ($imagem['erro'] !== null) {
+            $erros['imagem'] = $imagem['erro'];
+        }
+        if ($imagem['caminho'] === null && $imagem['erro'] === null) {
+            $erros['imagem'] = 'Selecione uma imagem de fundo.';
+        }
+        if ($erros !== []) {
+            if ($imagem['caminho'] !== null) {
+                Upload::excluir($imagem['caminho']);
+            }
+            Session::flash('form_erros', $erros);
+            Session::flash('form_valores', $request->post());
+            return redirect('admin/modulos/carrossel/novo');
+        }
+
+        $dados = $validacao['data'];
+        $dados['imagem'] = (string) $imagem['caminho'];
+        try {
+            $id = CarrosselRepository::salvar(null, $dados);
+        } catch (InvalidArgumentException $exception) {
+            Upload::excluir((string) $dados['imagem']);
+            Session::flash('erro', $exception->getMessage());
+            Session::flash('form_valores', $request->post());
+            return redirect('admin/modulos/carrossel/novo');
+        }
+
+        Audit::registrar('criar', 'carrossel', 'carrossel', $id, null, $dados);
+        Session::flash('sucesso', 'Imagem de fundo adicionada ao carrossel.');
+        return redirect('admin/modulos/carrossel/' . $id . '/editar');
+    }, [new CsrfMiddleware(), new PermissionMiddleware('carrossel', 'criar')]);
+
+    $router->post('/admin/modulos/carrossel/{id}', static function (Request $request, string $id) use ($carrosselImagem): Response {
+        $foto = CarrosselRepository::buscar((int) $id);
+        if ($foto === null) {
+            throw new HttpException(404, 'A imagem de fundo solicitada não foi encontrada.');
+        }
+
+        $imagem = $carrosselImagem($request, 'carrossel-' . (int) $id);
+        $validacao = Validator::validate($request->post(), CarrosselRepository::regras());
+        $erros = $validacao['errors'];
+        if ($imagem['erro'] !== null) {
+            $erros['imagem'] = $imagem['erro'];
+        }
+        if ($erros !== []) {
+            if ($imagem['caminho'] !== null) {
+                Upload::excluir($imagem['caminho']);
+            }
+            Session::flash('form_erros', $erros);
+            Session::flash('form_valores', $request->post());
+            return redirect('admin/modulos/carrossel/' . (int) $id . '/editar');
+        }
+
+        $dados = $validacao['data'];
+        $imagemAtual = (string) ($foto['imagem'] ?? '');
+        if ($imagem['caminho'] !== null) {
+            Upload::excluir($imagemAtual);
+            $imagemAtual = $imagem['caminho'];
+        }
+        $dados['imagem'] = $imagemAtual;
+        try {
+            CarrosselRepository::salvar((int) $id, $dados);
+        } catch (InvalidArgumentException $exception) {
+            Session::flash('erro', $exception->getMessage());
+            Session::flash('form_valores', $request->post());
+            return redirect('admin/modulos/carrossel/' . (int) $id . '/editar');
+        }
+
+        Audit::registrar('editar', 'carrossel', 'carrossel', (int) $id, $foto, $dados);
+        Session::flash('sucesso', 'Imagem de fundo atualizada com sucesso.');
+        return redirect('admin/modulos/carrossel/' . (int) $id . '/editar');
+    }, [new CsrfMiddleware(), new PermissionMiddleware('carrossel', 'editar')]);
+
+    $router->post('/admin/modulos/carrossel/{id}/ativo', static function (string $id): Response {
+        $foto = CarrosselRepository::buscar((int) $id);
+        if ($foto === null) {
+            throw new HttpException(404, 'A imagem de fundo solicitada não foi encontrada.');
+        }
+
+        $ativo = CarrosselRepository::alternarAtivo((int) $id);
+        Audit::registrar($ativo === 1 ? 'ativar' : 'desativar', 'carrossel', 'carrossel', (int) $id, null, ['ativo' => $ativo]);
+        Session::flash('sucesso', $ativo === 1 ? 'Imagem de fundo ativada no site.' : 'Imagem de fundo desativada do site.');
+        return redirect('admin/modulos/carrossel');
+    }, [new CsrfMiddleware(), new PermissionMiddleware('carrossel', 'editar')]);
+
+    $router->post('/admin/modulos/carrossel/{id}/excluir', static function (string $id): Response {
+        $foto = CarrosselRepository::buscar((int) $id);
+        if ($foto === null) {
+            throw new HttpException(404, 'A imagem de fundo solicitada não foi encontrada.');
+        }
+
+        CarrosselRepository::excluir((int) $id);
+        Upload::excluir((string) ($foto['imagem'] ?? ''));
+        Audit::registrar('excluir', 'carrossel', 'carrossel', (int) $id, $foto, null);
+        Session::flash('sucesso', 'Imagem de fundo excluída com sucesso.');
+        return redirect('admin/modulos/carrossel');
+    }, [new CsrfMiddleware(), new PermissionMiddleware('carrossel', 'excluir')]);
 
     $galeriaImagem = static function (Request $request, string $prefixo): array {
         $arquivo = $request->file('imagem');
@@ -2783,6 +2983,16 @@ return static function (Router $router): void {
         ], 'contato', 'contato', 'ver');
     }, [new PermissionMiddleware('contato', 'ver')]);
 
+    $router->post('/admin/modulos/contato/excluir-lidas', static function (): Response {
+        $quantidade = ContatoRepository::excluirLidas();
+        Audit::registrar('excluir', 'contato', 'contato_mensagens', null, ['quantidade' => $quantidade], null);
+        $mensagem = $quantidade === 1
+            ? '1 mensagem lida excluída com sucesso.'
+            : $quantidade . ' mensagens lidas excluídas com sucesso.';
+        Session::flash('sucesso', $mensagem);
+        return redirect('admin/modulos/contato');
+    }, [new CsrfMiddleware(), new PermissionMiddleware('contato', 'responder')]);
+
     $router->get('/admin/modulos/contato/{id}', static function (string $id): Response {
         $mensagem = ContatoRepository::buscar((int) $id);
         if ($mensagem === null) {
@@ -2836,6 +3046,23 @@ return static function (Router $router): void {
 
         Session::flash('sucesso', 'Resposta desmarcada.');
         return redirect('admin/modulos/contato/' . (int) $id);
+    }, [new CsrfMiddleware(), new PermissionMiddleware('contato', 'responder')]);
+
+    $router->post('/admin/modulos/contato/{id}/excluir', static function (string $id): Response {
+        $mensagem = ContatoRepository::buscar((int) $id);
+        if ($mensagem === null) {
+            throw new HttpException(404, 'A mensagem solicitada não foi encontrada.');
+        }
+
+        if ((int) $mensagem['lida'] !== 1) {
+            Session::flash('erro', 'Marque a mensagem como lida antes de excluí-la.');
+            return redirect('admin/modulos/contato/' . (int) $id);
+        }
+
+        ContatoRepository::excluir((int) $id);
+        Audit::registrar('excluir', 'contato', 'contato_mensagens', (int) $id, $mensagem, null);
+        Session::flash('sucesso', 'Mensagem excluída com sucesso.');
+        return redirect('admin/modulos/contato');
     }, [new CsrfMiddleware(), new PermissionMiddleware('contato', 'responder')]);
 
     $filtrosRelatorios = static function (Request $request): array {

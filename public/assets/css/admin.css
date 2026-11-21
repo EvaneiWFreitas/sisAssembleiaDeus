@@ -183,7 +183,25 @@
   border: 1px solid #e2e8f0;
   border-radius: 16px;
   box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+  min-width: 0;
   padding: 22px;
+}
+
+.text-break-anywhere {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.contact-message {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  max-height: 340px;
+  overflow: auto;
+  overflow-wrap: anywhere;
+  padding: 14px 16px;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .card-admin h2,
@@ -277,6 +295,8 @@
 
 .admin-table td {
   font-size: 0.86rem;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .admin-table .btn-group form {

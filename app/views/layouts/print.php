@@ -7,7 +7,7 @@ declare(strict_types=1);
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= e($titulo ?? 'Documento') ?> | sisAssembleiaDeus</title>
-  <link rel="icon" href="<?= e(asset('img/logo-assembleia.svg')) ?>" type="image/svg+xml">
+  <link rel="icon" href="<?= e($logotipo ?? \App\SiteRepository::logotipo()) ?>">
   <style>
     body { background: #f1f5f9; color: #0f172a; font-family: Arial, Helvetica, sans-serif; margin: 0; padding: 24px; }
     .print-page { background: #fff; border: 1px solid #cbd5e1; margin: 0 auto; max-width: 850px; padding: 32px; }

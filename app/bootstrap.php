@@ -23,6 +23,9 @@ try {
     Config::loadSettings(BASE_PATH . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . $ambiente . '.php');
 
     date_default_timezone_set((string) config('app.timezone', 'America/Sao_Paulo'));
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: SAMEORIGIN');
+    header('Referrer-Policy: strict-origin-when-cross-origin');
     error_reporting(E_ALL);
     ini_set('display_errors', (bool) config('app.debug', false) ? '1' : '0');
     ini_set('log_errors', '1');

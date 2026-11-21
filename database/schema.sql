@@ -134,6 +134,20 @@ CREATE TABLE IF NOT EXISTS `configuracoes` (
     KEY `idx_configuracoes_grupo` (`grupo`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `carrossel` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `titulo` VARCHAR(150) NULL DEFAULT NULL,
+    `descricao` VARCHAR(255) NULL DEFAULT NULL,
+    `imagem` VARCHAR(255) NOT NULL,
+    `ordem` SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+    `ativo` TINYINT(1) NOT NULL DEFAULT 1,
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `idx_carrossel_ativo` (`ativo`),
+    KEY `idx_carrossel_ordem` (`ordem`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- ------------------------------------------------------------
 -- 2. Estrutura ministerial
 -- ------------------------------------------------------------

@@ -11,6 +11,10 @@ $selecionado = static function (mixed $atual, mixed $esperado): string {
     return (string) $atual === (string) $esperado ? 'selected' : '';
 };
 $pastorPadrao = \App\DocumentoRepository::configuracao('pastor_presidente', '');
+$valorJuridico = static function (string $campo) use ($valor): string {
+    $informado = $valor($campo);
+    return $informado !== '' ? $informado : \App\DocumentoRepository::valorJuridicoPadrao($campo);
+};
 ?>
 <form method="post" action="<?= e($acao) ?>" id="form-documento">
   <?= csrf_field() ?>
@@ -59,6 +63,20 @@ $pastorPadrao = \App\DocumentoRepository::configuracao('pastor_presidente', '');
             <input class="form-control <?= isset($erros['pastor_responsavel']) ? 'is-invalid' : '' ?>" id="pastor_responsavel" name="pastor_responsavel" value="<?= e($valor('pastor_responsavel') !== '' ? $valor('pastor_responsavel') : $pastorPadrao) ?>" maxlength="180">
             <?= $erroCampo('pastor_responsavel') ?>
           </div>
+        </div>
+      </div>
+
+      <div class="card-admin mb-3">
+        <h2 class="h6 mb-1">Dados jurídicos para papel timbrado</h2>
+        <div class="small text-muted mb-3">Informe os documentos da igreja emissora. Eles aparecem no cabeçalho/rodapé da carta impressa.</div>
+        <div class="row g-3">
+          <?php foreach (\App\DocumentoRepository::dadosJuridicos() as $campo => $rotulo): ?>
+            <div class="col-md-6">
+              <label class="form-label" for="<?= e($campo) ?>"><?= e($rotulo) ?></label>
+              <input class="form-control <?= isset($erros[$campo]) ? 'is-invalid' : '' ?>" id="<?= e($campo) ?>" name="<?= e($campo) ?>" value="<?= e($valorJuridico($campo)) ?>" maxlength="<?= $campo === 'cnpj' ? '18' : ($campo === 'razao_social' ? '180' : '80') ?>" <?= $campo === 'razao_social' ? '' : 'placeholder="Opcional"' ?>>
+              <?= $erroCampo($campo) ?>
+            </div>
+          <?php endforeach; ?>
         </div>
       </div>
     </div>

@@ -72,4 +72,28 @@ final class ConfiguracaoRepository
             );
         }
     }
+
+    /** @param array<string, string> $valores */
+    public static function salvarChaves(array $valores): void
+    {
+        foreach ($valores as $chave => $valor) {
+            Database::run(
+                'INSERT INTO `configuracoes` (`chave`, `valor`, `grupo`, `tipo`, `descricao`)
+                 VALUES (:chave, :valor, "publico", "texto", :descricao)
+                 ON DUPLICATE KEY UPDATE
+                    `valor` = VALUES(`valor`),
+                    `descricao` = VALUES(`descricao`),
+                    `grupo` = VALUES(`grupo`),
+                    `tipo` = VALUES(`tipo`),
+                    `updated_at` = NOW()',
+                [
+                    ':chave' => (string) $chave,
+                    ':valor' => (string) $valor,
+                    ':descricao' => $chave === 'home_eyebrow'
+                        ? 'Texto em destaque acima do título na página inicial.'
+                        : 'Descrição exibida no carrossel da página inicial.',
+                ]
+            );
+        }
+    }
 }

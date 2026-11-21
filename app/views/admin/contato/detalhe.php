@@ -9,7 +9,7 @@ $base = url('/admin/modulos/contato');
 <div class="card-admin">
   <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
     <div>
-      <h5 class="mb-1"><?= e((string) ($mensagem['assunto'] !== '' ? $mensagem['assunto'] : 'Sem assunto')) ?></h5>
+      <h5 class="mb-1 text-break-anywhere"><?= e((string) ($mensagem['assunto'] !== '' ? $mensagem['assunto'] : 'Sem assunto')) ?></h5>
       <div class="small text-muted">Recebida em <?= e(format_date((string) $mensagem['created_at'])) ?></div>
     </div>
     <div class="d-flex flex-wrap gap-2">
@@ -27,7 +27,7 @@ $base = url('/admin/modulos/contato');
       <div class="border rounded p-3 h-100">
         <div class="small text-muted mb-1">Remetente</div>
         <div class="fw-semibold"><?= e((string) $mensagem['nome']) ?></div>
-        <a class="small text-decoration-none" href="mailto:<?= e((string) $mensagem['email']) ?>"><?= e((string) $mensagem['email']) ?></a>
+        <a class="small text-decoration-none text-break-anywhere" href="mailto:<?= e((string) $mensagem['email']) ?>"><?= e((string) $mensagem['email']) ?></a>
       </div>
     </div>
     <div class="col-md-6">
@@ -44,8 +44,11 @@ $base = url('/admin/modulos/contato');
   </div>
 
   <div class="border rounded p-3 mb-4">
-    <div class="small text-muted mb-2">Mensagem</div>
-    <div><?= nl2br(e((string) $mensagem['mensagem'])) ?></div>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+      <div class="small text-muted">Mensagem</div>
+      <div class="small text-muted"><?= e((string) mb_strlen((string) $mensagem['mensagem'])) ?> caracteres</div>
+    </div>
+    <div class="contact-message"><?= e((string) $mensagem['mensagem']) ?></div>
   </div>
 
   <?php if ($podeResponder): ?>
@@ -62,6 +65,12 @@ $base = url('/admin/modulos/contato');
           <i class="fa-solid fa-reply me-1"></i><?= $mensagem['respondida_em'] === null ? 'Marcar como respondida' : 'Desmarcar resposta' ?>
         </button>
       </form>
+      <?php if ((int) $mensagem['lida'] === 1): ?>
+        <form method="post" action="<?= e($base . '/' . (int) $mensagem['id'] . '/excluir') ?>" onsubmit="return confirm('Excluir esta mensagem lida? Esta ação não pode ser desfeita.');">
+          <?= csrf_field() ?>
+          <button class="btn btn-sm btn-outline-danger rounded-pill" type="submit"><i class="fa-solid fa-trash me-1"></i>Excluir mensagem</button>
+        </form>
+      <?php endif; ?>
     </div>
   <?php endif; ?>
 </div>

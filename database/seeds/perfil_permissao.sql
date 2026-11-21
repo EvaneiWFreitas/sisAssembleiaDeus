@@ -84,3 +84,18 @@ WHERE (`modulo`, `acao`) IN (
     ('estrutura','ver'), ('eventos','ver'), ('noticias','ver'), ('galeria','ver'),
     ('programacao','ver'), ('carteirinhas','ver'), ('relatorios','ver'), ('contato','ver')
 );
+
+INSERT IGNORE INTO `perfil_permissao` (`perfil_id`, `permissao_id`)
+SELECT 1, `id` FROM `permissoes` WHERE `modulo` = 'carrossel';
+
+INSERT IGNORE INTO `perfil_permissao` (`perfil_id`, `permissao_id`)
+SELECT 2, `id` FROM `permissoes` WHERE `modulo` = 'carrossel';
+
+INSERT IGNORE INTO `perfil_permissao` (`perfil_id`, `permissao_id`)
+SELECT 3, `id` FROM `permissoes` WHERE `modulo` = 'carrossel' AND `acao` IN ('ver', 'editar');
+
+INSERT IGNORE INTO `perfil_permissao` (`perfil_id`, `permissao_id`)
+SELECT 4, `id` FROM `permissoes` WHERE `modulo` = 'carrossel' AND `acao` = 'ver';
+
+INSERT IGNORE INTO `perfil_permissao` (`perfil_id`, `permissao_id`)
+SELECT 5, `id` FROM `permissoes` WHERE `modulo` = 'carrossel';
