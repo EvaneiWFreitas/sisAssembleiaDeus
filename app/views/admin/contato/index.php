@@ -116,6 +116,10 @@ $indicadores = [
                     <?= csrf_field() ?>
                     <button class="btn btn-sm btn-outline-<?= $mensagem['respondida_em'] === null ? 'success' : 'secondary' ?>" type="submit" title="<?= $mensagem['respondida_em'] === null ? 'Marcar como respondida' : 'Desmarcar resposta' ?>"><i class="fa-solid fa-reply"></i></button>
                   </form>
+                  <form class="d-inline" method="post" action="<?= e($base . '/' . $id . '/excluir') ?>" onsubmit="return confirm('Excluir esta mensagem?');">
+                    <?= csrf_field() ?>
+                    <button class="btn btn-sm btn-outline-danger" type="submit" title="Excluir mensagem"><i class="fa-solid fa-trash"></i></button>
+                  </form>
                 <?php endif; ?>
               </td>
             </tr>

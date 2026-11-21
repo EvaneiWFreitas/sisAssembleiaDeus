@@ -99,6 +99,7 @@ final class ContatoRepository
             [':id' => $id]
         );
     }
+<<<<<<< HEAD
 
     public static function excluirLidas(): int
     {
@@ -106,4 +107,6 @@ final class ContatoRepository
             'DELETE FROM `contato_mensagens` WHERE `lida` = 1'
         )->rowCount();
     }
+=======
+>>>>>>> cd83d20b3a8e458f36185ab3e53e975ae3c57e98
 }

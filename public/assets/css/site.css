@@ -616,6 +616,10 @@ img {
   border-top: 4px solid var(--site-secondary);
 }
 
+.contact-info .card-site {
+  height: auto;
+}
+
 .form-label {
   color: var(--site-primary);
   font-size: 0.86rem;

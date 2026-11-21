@@ -65,12 +65,19 @@ $base = url('/admin/modulos/contato');
           <i class="fa-solid fa-reply me-1"></i><?= $mensagem['respondida_em'] === null ? 'Marcar como respondida' : 'Desmarcar resposta' ?>
         </button>
       </form>
+<<<<<<< HEAD
       <?php if ((int) $mensagem['lida'] === 1): ?>
         <form method="post" action="<?= e($base . '/' . (int) $mensagem['id'] . '/excluir') ?>" onsubmit="return confirm('Excluir esta mensagem lida? Esta ação não pode ser desfeita.');">
           <?= csrf_field() ?>
           <button class="btn btn-sm btn-outline-danger rounded-pill" type="submit"><i class="fa-solid fa-trash me-1"></i>Excluir mensagem</button>
         </form>
       <?php endif; ?>
+=======
+      <form method="post" action="<?= e($base . '/' . (int) $mensagem['id'] . '/excluir') ?>" onsubmit="return confirm('Excluir esta mensagem?');">
+        <?= csrf_field() ?>
+        <button class="btn btn-sm btn-outline-danger rounded-pill" type="submit"><i class="fa-solid fa-trash me-1"></i>Excluir mensagem</button>
+      </form>
+>>>>>>> cd83d20b3a8e458f36185ab3e53e975ae3c57e98
     </div>
   <?php endif; ?>
 </div>

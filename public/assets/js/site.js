@@ -5,9 +5,11 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   var topo = document.getElementById("back-to-top");
+  var rodape = document.querySelector(".site-footer");
   if (topo) {
     window.addEventListener("scroll", function () {
-      topo.classList.toggle("is-visible", window.scrollY > 420);
+      var sobreRodape = rodape ? rodape.getBoundingClientRect().top < window.innerHeight - 60 : false;
+      topo.classList.toggle("is-visible", window.scrollY > 420 && !sobreRodape);
     });
     topo.addEventListener("click", function () {
       window.scrollTo({ top: 0, behavior: "smooth" });

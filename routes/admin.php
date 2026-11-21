@@ -3054,11 +3054,14 @@ return static function (Router $router): void {
             throw new HttpException(404, 'A mensagem solicitada não foi encontrada.');
         }
 
+<<<<<<< HEAD
         if ((int) $mensagem['lida'] !== 1) {
             Session::flash('erro', 'Marque a mensagem como lida antes de excluí-la.');
             return redirect('admin/modulos/contato/' . (int) $id);
         }
 
+=======
+>>>>>>> cd83d20b3a8e458f36185ab3e53e975ae3c57e98
         ContatoRepository::excluir((int) $id);
         Audit::registrar('excluir', 'contato', 'contato_mensagens', (int) $id, $mensagem, null);
         Session::flash('sucesso', 'Mensagem excluída com sucesso.');

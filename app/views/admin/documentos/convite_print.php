@@ -49,8 +49,13 @@ $modelo = preg_replace('/[^a-z]/', '', (string) ($convite['modelo'] ?? 'classico
 </style>
 <header class="print-top">
   <img src="<?= e($logotipo ?? \App\SiteRepository::logotipo()) ?>" alt="">
+<<<<<<< HEAD
   <div class="timbrado">
     <strong><?= e($nomeTimbrado) ?></strong>
+=======
+  <div>
+    <strong><?= e($ministerio !== '' ? $ministerio : 'Assembleia de Deus') ?></strong>
+>>>>>>> cd83d20b3a8e458f36185ab3e53e975ae3c57e98
     <small>sisAssembleiaDeus · Correspondência eclesiástica</small>
     <?php if ($enderecoCompleto !== ''): ?>
       <div class="timbrado-endereco"><?= e($enderecoCompleto) ?></div>

@@ -37,7 +37,16 @@ if (!function_exists('url')) {
 if (!function_exists('asset')) {
     function asset(string $caminho): string
     {
+<<<<<<< HEAD
         return url('public/assets/' . ltrim($caminho, '/'));
+=======
+        $relativo = ltrim($caminho, '/');
+        $url = url('assets/' . $relativo);
+        $arquivo = public_path('assets/' . $relativo);
+        $modificado = is_file($arquivo) ? filemtime($arquivo) : false;
+
+        return $modificado === false ? $url : $url . '?v=' . $modificado;
+>>>>>>> cd83d20b3a8e458f36185ab3e53e975ae3c57e98
     }
 }
 
